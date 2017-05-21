@@ -8,7 +8,7 @@ Major change in Apr 22nd
 Updated in Nov 25th
 """
 
-from __future__ import with_statement
+
 import sys
 import getopt
 import numpy
@@ -46,7 +46,7 @@ def flex_bins(num_of_bins, ratio_dict, num_of_reads):
         k = (ratio_keys[start] if start else 0,
              ratio_keys[k_of_ratio] if k_of_ratio < num_of_keys else ratio_keys[k_of_ratio - 1] + 1)
         ratio_bins[k] = []
-        for i in xrange(start, k_of_ratio):
+        for i in range(start, k_of_ratio):
             ratio_bins[k].extend(ratio_dict[ratio_keys[i]])
 
         k_of_bin += 1
@@ -54,7 +54,7 @@ def flex_bins(num_of_bins, ratio_dict, num_of_reads):
     if k_of_ratio < num_of_keys - 1:
         k = (ratio_keys[k_of_ratio], ratio_keys[num_of_keys - 1] + 1)
         ratio_bins[k] = []
-        for i in xrange(k_of_ratio, num_of_keys - 1):
+        for i in range(k_of_ratio, num_of_keys - 1):
             ratio_bins[k].extend(ratio_dict[ratio_keys[i]])
 
     return ratio_bins
@@ -128,7 +128,7 @@ def head_align_tail(outfile, num_of_bins):
     hist_aligned, bin_edges = numpy.histogram(aligned, bins=numpy.arange(0, max_length + 50, 50), density=True)
     cdf = numpy.cumsum(hist_aligned * 50)
     out1.write("bin\t0-" + str(max_length) + '\n')
-    for i in xrange(len(cdf)):
+    for i in range(len(cdf)):
         out1.write(str(bin_edges[i]) + '-' + str(bin_edges[i+1]) + "\t" + str(cdf[i]) + '\n')
     num_aligned = len(aligned)
 
@@ -136,7 +136,7 @@ def head_align_tail(outfile, num_of_bins):
     hist_reads, bin_edges = numpy.histogram(total, bins=numpy.arange(0, max_length + 50, 50), density=True)
     cdf = numpy.cumsum(hist_reads * 50)
     out2.write("bin\t0-" + str(max_length) + '\n')
-    for i in xrange(len(cdf)):
+    for i in range(len(cdf)):
         out2.write(str(bin_edges[i]) + '-' + str(bin_edges[i+1]) + "\t" + str(cdf[i]) + '\n')
 
     # ecdf of head/total ratio
@@ -144,14 +144,14 @@ def head_align_tail(outfile, num_of_bins):
 
     ht_ratio_bins = flex_bins(num_of_bins, ht_ratio, len(total))
 
-    ht_cum = dict.fromkeys(ht_ratio_bins.keys(), [])
-    for key, value in ht_ratio_bins.items():
+    ht_cum = dict.fromkeys(list(ht_ratio_bins.keys()), [])
+    for key, value in list(ht_ratio_bins.items()):
         hist_ht, bin_edges = numpy.histogram(value, bins=numpy.arange(0, 1.001, 0.001), density=True)
         cdf = numpy.cumsum(hist_ht * 0.001)
         ht_cum[key] = cdf
 
     out3.write("bins\t" + '\t'.join("%s-%s" % tup for tup in sorted(ht_cum.keys())) + '\n')
-    for i in xrange(len(cdf)):
+    for i in range(len(cdf)):
         out3.write(str(bin_edges[i]) + '-' + str(bin_edges[i+1]) + "\t")
         for key in sorted(ht_cum.keys()):
             out3.write(str(ht_cum[key][i]) + "\t")
@@ -160,14 +160,14 @@ def head_align_tail(outfile, num_of_bins):
     # ecdf of align ratio
     align_ratio_bins = flex_bins(num_of_bins, align_ratio, len(total))
 
-    align_cum = dict.fromkeys(align_ratio_bins.keys(), [])
-    for key, value in align_ratio_bins.items():
+    align_cum = dict.fromkeys(list(align_ratio_bins.keys()), [])
+    for key, value in list(align_ratio_bins.items()):
         hist_ratio, bin_edges = numpy.histogram(value, bins=numpy.arange(0, 1.001, 0.001), density=True)
         cdf = numpy.cumsum(hist_ratio * 0.001)
         align_cum[key] = cdf
 
     out4.write("bins\t" + '\t'.join("%s-%s" % tup for tup in sorted(align_cum.keys())) + '\n')
-    for i in xrange(len(cdf)):
+    for i in range(len(cdf)):
         out4.write(str(bin_edges[i]) + '-' + str(bin_edges[i+1]) + "\t")
         for key in sorted(align_cum.keys()):
             out4.write(str(align_cum[key][i]) + "\t")

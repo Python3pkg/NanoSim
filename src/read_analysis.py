@@ -10,8 +10,8 @@ This script generates read profiles Oxford Nanopore 2D reads.
 """
 
 
-from __future__ import print_function
-from __future__ import with_statement
+
+
 from subprocess import call
 from time import strftime
 try:
@@ -97,7 +97,7 @@ def main(argv):
                 dic_reads[name] = ""
             else:
                 dic_reads[name] += line.strip()
-    for k, v in dic_reads.items():
+    for k, v in list(dic_reads.items()):
         out_fasta.write('>' + k + '\n' + v + '\n')
     out_fasta.close()
 
@@ -138,7 +138,7 @@ def main(argv):
         cdf = numpy.cumsum(hist_unaligned * 50)
         out1.write("Aligned / Unaligned ratio:" + "\t" + str(num_aligned * 1.0 / num_unaligned) + '\n')
         out1.write("bin\t0-" + str(max_length) + '\n')
-        for i in xrange(len(cdf)):
+        for i in range(len(cdf)):
             out1.write(str(edges_unaligned[i]) + '-' + str(edges_unaligned[i+1]) + "\t" + str(cdf[i]) + '\n')
     else:
         out1.write("Aligned / Unaligned ratio:\t100%\n")

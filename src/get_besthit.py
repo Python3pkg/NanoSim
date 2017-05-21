@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import with_statement
+
 
 
 def besthit_and_unaligned(infile, outmaf, outfile):
@@ -42,4 +42,4 @@ def besthit_and_unaligned(infile, outmaf, outfile):
                     unaligned_dict[last_name] = len(line.strip())
 
     out1.close()
-    return unaligned_dict.values()
+    return list(unaligned_dict.values())

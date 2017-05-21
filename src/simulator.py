@@ -9,8 +9,8 @@ This script generates simulated Oxford Nanopore 2D reads.
 """
 
 
-from __future__ import print_function
-from __future__ import with_statement
+
+
 import sys
 import getopt
 import random
@@ -74,7 +74,7 @@ def read_ecdf(profile):
         new = line.strip().split('\t')
         ratio = [float(x) for x in new[0].split('-')]
         prob = [float(x) for x in new[1:]]
-        for i in xrange(lanes):
+        for i in range(lanes):
             if prob[i] == l_prob[i]:
                 continue
             else:
@@ -86,7 +86,7 @@ def read_ecdf(profile):
                 l_ratio[i] = ratio[1]
                 l_prob[i] = prob[i]
 
-    for i in xrange(0, len(ecdf_key)):
+    for i in range(0, len(ecdf_key)):
         last_key = sorted(ecdf_dict[ecdf_key[i]].keys())[-1]
         last_value = ecdf_dict[ecdf_key[i]][last_key]
         ecdf_dict[ecdf_key[i]][last_key] = (last_value[0], ratio[1])
@@ -96,12 +96,12 @@ def read_ecdf(profile):
 
 def get_length(len_dict, num, max_l, min_l):
     length_list = []
-    for i in xrange(num):
+    for i in range(num):
         middle_ref = 0
         key = tuple(len_dict.keys())[0]
         while middle_ref <= min_l or middle_ref > max_l:
             p = random.random()
-            for k_p, v_p in len_dict[key].items():
+            for k_p, v_p in list(len_dict[key].items()):
                 if k_p[0] <= p < k_p[1]:
                     middle_ref = int(round((p - k_p[0])/(k_p[1] - k_p[0]) * (v_p[1] - v_p[0]) + v_p[0]))
                     break
@@ -222,7 +222,7 @@ def simulation(ref, out, dna_type, per, kmer_bias, max_l, min_l):
         sys.stderr.write("Do not choose circular if there is more than one chromosome in the genome!")
         sys.exit(1)
 
-    for key in seq_dict.keys():
+    for key in list(seq_dict.keys()):
         seq_len[key] = len(seq_dict[key])
     genome_len = sum(seq_len.values())
 
@@ -237,7 +237,7 @@ def simulation(ref, out, dna_type, per, kmer_bias, max_l, min_l):
 
     # Simulate unaligned reads
     num_unaligned_length = len(unaligned_length)
-    for i in xrange(num_unaligned_length):
+    for i in range(num_unaligned_length):
         unaligned = unaligned_length[i]
         unaligned, error_dict = unaligned_error_list(unaligned, error_par)
         new_read, new_read_name = extract_read(dna_type, unaligned)
@@ -263,7 +263,7 @@ def simulation(ref, out, dna_type, per, kmer_bias, max_l, min_l):
         ref_length = get_length(aligned_dict, number_aligned, max_l, min_l)
         del aligned_dict
 
-        for i in xrange(number_aligned):
+        for i in range(number_aligned):
             new_read, new_read_name = extract_read(dna_type, ref_length[i])
             new_read_name = new_read_name + "_perfect_" + str(i)
             
@@ -293,7 +293,7 @@ def simulation(ref, out, dna_type, per, kmer_bias, max_l, min_l):
                 break
 
         p = random.random()
-        for k_r, v_r in align_ratio[k_align].items():
+        for k_r, v_r in list(align_ratio[k_align].items()):
             if k_r[0] <= p < k_r[1]:
                 a_ratio = (p - k_r[0])/(k_r[1] - k_r[0]) * (v_r[1] - v_r[0]) + v_r[0]
                 total = int(round(middle / a_ratio))
@@ -310,7 +310,7 @@ def simulation(ref, out, dna_type, per, kmer_bias, max_l, min_l):
             for k_ht in sorted(ht_dict.keys()):
                 if k_ht[0] <= remainder < k_ht[1]:
                     p = random.random()
-                    for k_h, v_h in ht_dict[k_ht].items():
+                    for k_h, v_h in list(ht_dict[k_ht].items()):
                         if k_h[0] <= p < k_h[1]:
                             ratio = (p - k_h[0])/(k_h[1] - k_h[0]) * (v_h[1] - v_h[0]) + v_h[0]
                             head = int(round(remainder * ratio))
@@ -392,7 +392,7 @@ def extract_read(dna_type, length):
         while True:
             new_read = ""
             ref_pos = random.randint(0, genome_len)
-            for key in seq_len.keys():
+            for key in list(seq_len.keys()):
                 if ref_pos + length <= seq_len[key]:
                     new_read = seq_dict[key][ref_pos: ref_pos + length]
                     new_read_name = key + "_" + str(ref_pos)
@@ -413,7 +413,7 @@ def unaligned_error_list(length, error_p):
     last_is_ins = False
     while pos < length:
         p = random.random()
-        for k_error in error_rate.keys():
+        for k_error in list(error_rate.keys()):
             if k_error[0] <= p < k_error[1]:
                 error_type = error_rate[k_error]
                 break
@@ -458,7 +458,7 @@ def error_list(m_ref, m_model, m_ht_list, error_p, trans_p):
     # The first match come from m_ht_list
     p = random.random()
     k1 = list(m_ht_list.keys())[0]
-    for k2, v2 in m_ht_list[k1].items():
+    for k2, v2 in list(m_ht_list[k1].items()):
         if k2[0] < p <= k2[1]:
             prev_match = int(np.floor((p - k2[0])/(k2[1] - k2[0]) * (v2[1] - v2[0]) + v2[0]))
             if prev_match < 2:
@@ -469,7 +469,7 @@ def error_list(m_ref, m_model, m_ht_list, error_p, trans_p):
     while pos < middle_ref:
         # pick the error based on Markov chain
         p = random.random()
-        for k in trans_p[prev_error].keys():
+        for k in list(trans_p[prev_error].keys()):
             if k[0] <= p < k[1]:
                 error = trans_p[prev_error][k]
                 break
@@ -495,11 +495,11 @@ def error_list(m_ref, m_model, m_ht_list, error_p, trans_p):
         prev_error = error
 
         # Randomly select a match length
-        for k1 in m_model.keys():
+        for k1 in list(m_model.keys()):
             if k1[0] <= prev_match < k1[1]:
                 break
         p = random.random()
-        for k2, v2 in m_model[k1].items():
+        for k2, v2 in list(m_model[k1].items()):
             if k2[0] < p <= k2[1]:
                 step = int(np.floor((p - k2[0])/(k2[1] - k2[0]) * (v2[1] - v2[0]) + v2[0]))
                 break
@@ -520,7 +520,7 @@ def error_list(m_ref, m_model, m_ht_list, error_p, trans_p):
 
 def mutate_read(read, read_name, error_log, e_dict, k, aligned=True):
     search_pattern = "A" * k + "+|" + "T" * k + "+|" + "C" * k + "+|" + "G" * k
-    for key in sorted(e_dict.keys(), reverse=True):
+    for key in sorted(list(e_dict.keys()), reverse=True):
         val = e_dict[key]
         key = int(round(key))
 
@@ -528,7 +528,7 @@ def mutate_read(read, read_name, error_log, e_dict, k, aligned=True):
             ref_base = read[key: key + val[1]]
             while True:
                 new_bases = ""
-                for i in xrange(val[1]):
+                for i in range(val[1]):
                     tmp_bases = list(BASES)
                     tmp_bases.remove(read[key + i])
                     new_base = random.choice(tmp_bases)
@@ -547,7 +547,7 @@ def mutate_read(read, read_name, error_log, e_dict, k, aligned=True):
             ref_base = val[1] * "-"
             while True:
                 new_bases = ""
-                for i in xrange(val[1]):
+                for i in range(val[1]):
                     new_base = random.choice(BASES)
                     new_bases += new_base
                 check_kmer = read[max(key - k + 1, 0): key] + new_bases + read[key: key + k - 1]
@@ -574,9 +574,9 @@ def case_convert(s_dict):
                  'D': ['A', 'G', 'T'], 'V': ['A', 'C', 'G'], 'H': ['A', 'C', 'T'], 'B': ['C', 'G', 'T'],
                  'N': ['A', 'T', 'C', 'G'], 'X': ['A', 'T', 'C', 'G']}
 
-    for k, v in s_dict.items():
+    for k, v in list(s_dict.items()):
         up_string = v.upper()
-        for i in xrange(len(up_string)):
+        for i in range(len(up_string)):
             if up_string[i] in base_code:
                 up_string = up_string[:i] + random.choice(base_code[up_string[i]]) + up_string[i+1:]
         out_dict[k] = up_string
